@@ -79,6 +79,7 @@ int entry_count;
 gcc -o filename.cgi filename.c cgipost.c
 
 [출처 : http://deadfire.net/cgic/cgic14.html] 
-구글링하면서 더 복잡하고 좋아보이는 라이브러리도 보았지만, 내가 쓰기엔 이게 더 간단하고 편한것 같다. 내일은 DB를 연동해 로그인 및 회원가입을 구현하
+구글링하면서 더 복잡하고 좋아보이는 라이브러리도 보았지만, 내가 쓰기엔 이게 더 간단하고 편한것 같다. 내일은 DB를 연동해 로그인 및 회원가입을 구현하자.
 
+간단한 입출력 페이지 --> http://34.121.15.144/account.html
 
