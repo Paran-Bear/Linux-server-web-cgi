@@ -1,0 +1,21 @@
+<!DOCTYPE HTML>
+<meta charset="utf-8">
+<HTML><BODY>
+		<FORM METHOD=POST ACTION="../cgi-bin/account.cgi">
+			이름 : <INPUT TYPE=text NAME=username><BR>
+			아이디 : <INPUT TYPE=text NAME=userid><BR>
+			비밀번호 : <INPUT TYPE=password NAME=passwd><BR>
+			비밀번호 확인 : <INPUT TYPE=chpassword NAME=chpasswd><BR>
+			결제 카드 : <SELECT NAME=card>
+				<OPTION>신용
+				<OPTION>체크
+			</SELECT><BR>
+			카드번호 : <INPUT TYPE=cardnum NAME=cardnum>
+			유효기간 : <INPUT TYPE=cardyear NAME=cardyear><BR>
+			배송주소   : <INPUT TYPE=radio NAME=area VALUE=home> 자택
+			<INPUT TYPE=radio NAME=area VALUE=company> 회사<BR>
+			주소지: <TEXTAREA NAME=addr></TEXTAREA><BR>
+			<INPUT TYPE=submit VALUE="가입하기">
+		</FORM>
+</BODY></HTML>
+
