@@ -4,7 +4,7 @@
 #include"cgipost.h"
 #include<string.h>
 #include<stdlib.h>
-
+//getPostData()를 먼저 호출한다.
 int main()
 {
         int fields;
