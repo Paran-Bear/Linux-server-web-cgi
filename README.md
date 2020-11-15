@@ -87,3 +87,33 @@ gcc -o filename.cgi filename.c cgipost.c
 
 간단한 입출력 페이지 --> http://34.121.15.144/account.html
 
+-------------------------
+11/15 
+C에서 mysql연동을 시도했다. 많은 시도끝에 성공했다. 
+먼저 mysql API를 사용하기 위해서 라이브러리를 설치해야한다.
+apt-get install libmysqlclient-dev
+라이브러리를 설치해준다.
+헤더를 포함할때는 경로, 헤더파일 이름을 넣는다
+#include"/usr/include/mysql/mysql.h"
+컴파일 할때는 뒤에 명령어로 
+-lmysqlclient
+추가한다.
+gcc -o filename code.c -lmysqlclient
+가 되겠다.
+
+이제 연동을 하면되는데 자세한 API는 txt파일로 올려서 확인한다.
+
+C에서 HTML에서 전달받은 인수를 사용하기 위해서 
+srtcat();
+함수를 사용해야했다.
+
+주의할점은 
+cgiPostData();
+와
+MYSQL *mysql;
+같은 함수를 호출할 순서를 틀리면
+세그먼트 에러가 생긴다.
+
+앞으로 작성할 코드는 input_data.c를 기준으로 삼아서 작성한다.
+
+
