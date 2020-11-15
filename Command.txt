@@ -1,0 +1,164 @@
+mysql commande
+
+*사용자 조회
+use mysql;
+select user, host from user;
+
+*사용자 추가/생성 --> root로 접속할 것
+create user 'user_id'@'localhost' identified by 'user_pwd'; --> 패스워드 정책 지킬 것
+
+*비밀번호 정책 확인
+SHOW VARIABLES LIKE 'validate_password%'
+
+*비밀번호 정책 변경 -->디폴트는 medium
+SET GLOBAL validate_password_policy=LOW; 
+SET GLOBAL validate_password_length = 원하는 길이;
+select password('<테스트할 패스워드>'); <--패스워드 테스트
+
+*DB생성
+create database db_name;
+
+*작업중 DB 확인
+select database();
+
+*작업할 DB선택
+use db_name;
+
+*DB의 인코딩 셋 확인
+SELECT default_character_set_name, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA 
+WHERE schema_name = "db_name";
+
+*table 인코딩 확인
+SELECT CCSA.character_set_name FROM information_schema.`TABLES` T,
+       information_schema.`COLLATION_CHARACTER_SET_APPLICABILITY` CCSA
+WHERE CCSA.collation_name = T.table_collation
+  AND T.table_schema = "user_data"
+  AND T.table_name = "name";
+
+*DB 인코딩 셋 변경
+ALTER DATABASE db_name DEFAULT CHARACTER SET utf8;
+ALTER TABLE table_name convert to charset utf8;
+
+
+*DB 삭제
+drop database db_name;
+
+
+
+*C에서 사용할 때
+*컴파일
+apt-get install libmysqlclient-dev <- 꼭 해주자.
+*헤더 포함할때
+	mysql_config --cflags로 위치확인
+#include"/경로/mysql.h"포함할것.
+*컴파일 커맨드
+gcc -o name Ccode.c -lmysqlclient
+
+*C 코드를 짤 때 출력결과에서 한글이 안나올때
+mysql_options(&mysql, MYSQL_SET_CHARSET_NAME, "utf8");
+mysql_options(&mysql, MYSQL_INIT_COMMAND, "SET NAMES utf8");
+위 두줄을 추가하자. 초기화 하고 그 뒤에 추가하자.
+
+*mysql 쿼리 커맨드
+https://extbrain.tistory.com/39
+
+*C코드에서 mysql API자료형
+MYSQL : Database와의 연결을 관리하는 구조체이다. 대부분의 C API 함수에서 쓰인다.
+MYSQL_RES : SELECT 등 결과를 리턴하는 query의 결과를 나타내는 자료형이다.
+MYSQL_ROW : MYSQL_RES에서 하나의 레코드씩 값을 얻어 올때 쓰이는 자료형이다.
+MYSQL_FIELD : 필드의 이름과 필드의 타입 등 필드에 관한 정보를 저장하는 자료형이다.
+
+MYSQL* mysql_init(MYSQL *mysql)
+-->mysql객체를 초기화 실사용 예시) mysql_init(&mysql);
+MYSQL* mysql_real_connect(MYSQL* mysql, const char* host, const char* user,const char* passwd, const char* db, uint port, const char* unix_socket, uint client_flag)
+host에 서버로 연결을 시도하는 함수. mysql_get_client_info() 함수를 제외하고 모든 API 사용전 꼭 호출하는 함수.
+mysql : MYSQL 변수에 대한 포인터 형이다.
+host : 연결하고자 하는 서버의 IP Address 혹은 도메인 이름을 적어주면 된다.
+NULL로 적어주면 localhost를 의미한다.
+user : 접속시의 사용자 이름이다. NULL이면 현재 login한 user ID가 된다.
+passwd : user의 암호를 나타낸다. NULL이면 암호가 없다는 의미이다.
+db : 접속시에 사용하고자 하는 database를 나타낸다. NULL로 지정을 하면 연결 후에
+mysql_select_db() 혹은 mysql_query()를 이용해서 지정할 수 있고,
+database를 바꿀 수도 있다.
+port : TCP/IP 연결시에 사용할 포트 번호를 나타낸다.
+unix_socket : 보통 NULL로 하면된다.
+client_flag : 이 인자도 보통 0으로 해주면 된다.
+mysql_real_connect()는 성공적으로 연결이 되면, MYSQL 포인터를 넘겨주고 연결에 실패하였을 경우 NULL을 리턴한다.
+연결에 실패 하였을 경우 이 글이 마지막에 있는 ‘문제 해결’부분을 읽어 보길 바란다. 사용 예는 위의 예제에 나와있다.
+
+실 사용 예시) mysql_real_connect(&mysql,NULL,"test","123qwe","test_db",3306,(char *)NULL,0)
+연결에 실패하면 NULL값을 리턴한다.
+
+연결을 했으면 해제를 하자 * void mysql_close(MYSQL* mysql) -- > mysql_close(&mysql);
+
+쿼리 결과값
+int mysql_query(MYSQL* mysql, const char* query) : 쿼리문을 실행한다. ; 는 안붙인다. 끝 문자는 \0 NULL문자다. 바이너리 데이터가 섞이면 쿼리를 수행할 수 없다. 성공하면 0을 리턴한다.
+
+int mysql_real_query(MYSQL* mysql, const char* query, unsigned int length) : 쿼리의 끝을 문자 길이로 구분. NULL문자 포함 바이너리 데이터가 있어도 쿼리 수행 가능. 성고하면 0 을 리턴
+실 사용 예시 mysql_query(&mysql, “SELECT * FROM dome”) ;
+
+mysql_store_result(MYSQL* mysql) --> 모든 ROW를 불러와 저장한다. 
+mysql_data_seek()나 mysql_row_seek()를 이용하여 현재 ROW에서 앞이나 뒤의 ROW로 자유자재로 왔다 갔다 할 수 있다는 것이다. 
+또한, mysql_num_rows()를 이용하여, 몇 개의 ROW가 리턴됐는지도 알 수 있다.
+
+mysql_use_result(MYSQL* mysql) --> 한 ROW만 불러온다. 
+
+데이터 접근 
+mysql_fetch_row()
+MYSQL_ROW mysql_fetch_row(MYSQL_ROW* result) --> 가져올 row가 없으면 NULL반환
+result에 있는 ROW들에서 한 개의 ROW를 얻어 온다. 한 개의 ROW에서 각각의 field는 배열 형태로 들어 있다. 더 이상 가져올 ROW가 없으면 NULL을 리턴한다.
+
+현재의 result에 몇 개의 field가 있는지 mysql_num_fields()를 이용하여 알 수 있다.
+
+
+**주의. ROW를 리턴하지 않는 쿼리를 실행하면  mysql_free_result( res ) ;  mysql_close(&mysql) ; 에서  에러가 발생하므로 주의하자.
+num_fields()를 이용하면 에러해결에 도움이 된다. 최소 쿼리가 리턴을하면 최소 0보단 크기 때문이다.
+
+
+
+#include<stdio.h>
+#include"/usr/include/mysql/mysql.h"
+#include<errno.h>
+
+void main(void)
+{
+        MYSQL mysql;
+        MYSQL_RES* res;
+        MYSQL_ROW row;
+        int fields;
+
+        mysql_init(&mysql);//객체 초기화
+        mysql_options(&mysql, MYSQL_SET_CHARSET_NAME, "utf8");
+        mysql_options(&mysql, MYSQL_INIT_COMMAND, "SET NAMES utf8");//한글 사용
+        if(!mysql_real_connect(&mysql,NULL,"test","123qwe","test_db",3306,(char *)NULL,0))//연결을 시도.
+                //연결시도. 실패하면 에러메시지 출력.
+        {printf("%s \n",mysql_error(&mysql));
+                exit(1);}
+        if(mysql_query(&mysql,"USE test_db"))//쿼리문 실행.
+        {
+                printf("%s \n",mysql_error(&mysql));exit(1);//쿼리 실패시 메시지 출력
+                                }
+                                if(mysql_query(&mysql,"SELECT * FROM user_data"))//쿼리 실행.
+                                {
+                                printf("%s \n",mysql_error(&mysql));exit(1);//실패시 출력.
+                                                }
+        res=mysql_store_result(&mysql);//실행한 쿼리결과를 res에 저장.
+        fields=mysql_num_fields(res);//res에몇개의 필드가 있는지 저장.
+        while((row=mysql_fetch_row(res)))//row에 res에 저장된 데이터에 접근하여 저장
+        {
+        for(int cnt=0;cnt<fields;++cnt)//필드수만큼 반복.
+        {printf("%12s",row[cnt]);printf("\n");}//row[index]에 접근.
+        mysql_free_result(res);//메모리 반환
+        mysql_close(&mysql);//메모리 반환
+        }
+}
+
+
+
+
+
+
+
+
+
+
